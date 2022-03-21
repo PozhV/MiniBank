@@ -12,5 +12,6 @@ namespace MiniBank.Core.Domains.Accounts
         public string UserId { get; set; }
         public decimal Balance { get; set; }
         public string CurrencyName { get; set; }
+        public bool IsOpen { get; set; }
     }
 }

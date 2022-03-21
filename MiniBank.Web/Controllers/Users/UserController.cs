@@ -25,6 +25,11 @@ namespace MiniBank.Web.Controllers.Users
             });
 
         }
+        [HttpGet]
+        public IEnumerable<User> GetAll()
+        {
+            return _userService.GetAll();
+        }
         [HttpPut]
         public void Edit(string Id, [FromQuery]UserDto model)
         {

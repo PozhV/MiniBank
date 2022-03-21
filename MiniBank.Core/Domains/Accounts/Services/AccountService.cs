@@ -31,6 +31,10 @@ namespace MiniBank.Core.Domains.Accounts.Services
             }
             return _accountRepository.Create(account);
         }
+        public IEnumerable<Account> GetAll()
+        {
+            return _accountRepository.GetAll();
+        }
         public void Delete(string Id)
         {
             if (String.IsNullOrEmpty(Id))

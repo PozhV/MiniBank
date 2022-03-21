@@ -10,5 +10,6 @@ namespace MiniBank.Core.Domains.Accounts.Services
     {
         Account Create(Account account);
         void Delete(string UserId);
+        IEnumerable<Account> GetAll();
     }
 }

@@ -10,5 +10,6 @@ namespace MiniBank.Core.Domains.Accounts.Repositories
     {
         Account Create(Account account);
         void Delete(string Id);
+        IEnumerable<Account> GetAll();
     }
 }

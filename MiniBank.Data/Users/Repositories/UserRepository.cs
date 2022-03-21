@@ -7,14 +7,6 @@ namespace MiniBank.Data.Users.Repositories
     public class UserRepository : IUserRepository
     {
         public static Dictionary<string, UserDbModel> _userStorage = new Dictionary<string, UserDbModel>();
-        public IEnumerable<User> GetAll()
-        {
-            return _userStorage.Select(it => new User
-            {
-                Email = it.Value.Email,
-                Login = it.Value.Login
-            });
-        }
         public void Edit(User user)
         {
             if(!_userStorage.ContainsKey(user.UserId))
@@ -44,6 +36,15 @@ namespace MiniBank.Data.Users.Repositories
             };
             user.UserId = id;
             return user;
+        }
+        public IEnumerable<User> GetAll()
+        {
+            return _userStorage.Select(it => new User
+            {
+                UserId = it.Value.UserId,
+                Login = it.Value.Login,
+                Email = it.Value.Email
+            });
         }
 
         public void Delete(string id)

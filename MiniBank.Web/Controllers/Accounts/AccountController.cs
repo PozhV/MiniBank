@@ -30,6 +30,11 @@ namespace MiniBank.Web.Controllers.Accounts
                 Balance = model.Balance
             });
         }
+        [HttpGet("/GetAll")]
+        public IEnumerable<Account> GetAll()
+        {
+            return _accountService.GetAll();
+        }
         [HttpPut(Name = "Execute Transaction")]
         public void ExecuteTransaction([FromQuery]TransactionDto model)
         {

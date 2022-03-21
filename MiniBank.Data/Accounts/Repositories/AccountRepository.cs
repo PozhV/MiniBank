@@ -34,6 +34,17 @@ namespace MiniBank.Data.Accounts.Repositories
             account.Id = id;
             return account;
         }
+        public IEnumerable<Account> GetAll()
+        {
+            return _accounts.Select(it => new Account
+            {
+                Id = it.Value.Id,
+                UserId = it.Value.UserId,
+                Balance = it.Value.Balance,
+                CurrencyName=it.Value.CurrencyName,
+                IsOpen = it.Value.IsOpen
+            });
+        }
         public void Delete(string id)
         {
             if(!_accounts.ContainsKey(id))
