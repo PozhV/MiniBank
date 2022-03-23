@@ -8,10 +8,10 @@ namespace MiniBank.Data.Transactions
 {
     public class TransactionDbModel
     {
-        public string TransactionId { get; set; }
+        public Guid TransactionId { get; set; }
         public string CurrencyName { get; set; }
         public decimal Amount { get; set; }
-        public string FromAccountId { get; set; }
-        public string ToAccountId { get; set; }
+        public Guid FromAccountId { get; set; }
+        public Guid ToAccountId { get; set; }
     }
 }

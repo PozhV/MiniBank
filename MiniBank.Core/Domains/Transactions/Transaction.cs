@@ -9,7 +9,7 @@ namespace MiniBank.Core.Domains.Transactions
     public class Transaction
     {
         public decimal Amount { get; set; }
-        public string FromAccountId { get; set; }
-        public string ToAccountId { get; set; }
+        public Guid FromAccountId { get; set; }
+        public Guid ToAccountId { get; set; }
     }
 }

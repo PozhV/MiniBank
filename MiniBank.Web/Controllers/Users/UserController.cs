@@ -7,7 +7,7 @@ using MiniBank.Data.Users;
 namespace MiniBank.Web.Controllers.Users
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/[action]", Name = "[controller]_[action]")]
     public class UserController
     {
         private readonly IUserService _userService;
@@ -26,12 +26,12 @@ namespace MiniBank.Web.Controllers.Users
 
         }
         [HttpGet]
-        public IEnumerable<User> GetAll()
+        public IEnumerable<User> List()
         {
             return _userService.GetAll();
         }
         [HttpPut]
-        public void Edit(string Id, [FromQuery]UserDto model)
+        public void Edit(Guid Id, [FromQuery]UserDto model)
         {
             _userService.Edit(new User
             {
@@ -41,7 +41,7 @@ namespace MiniBank.Web.Controllers.Users
             });
         }
         [HttpDelete]
-        public void Delete(string id)
+        public void Delete(Guid id)
         {
             _userService.Delete(id);
         }

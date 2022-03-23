@@ -10,7 +10,7 @@ namespace MiniBank.Core.Domains.Users.Repositories
     {
         IEnumerable<User> GetAll();
         User Create(User user);
-        void Delete(string id);
+        void Delete(Guid id);
         void Edit(User user);
     }
 }

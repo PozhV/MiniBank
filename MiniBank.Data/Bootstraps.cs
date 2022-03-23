@@ -6,6 +6,7 @@ using MiniBank.Core.Domains.Accounts.Repositories;
 using MiniBank.Core.Domains.Transactions;
 using MiniBank.Data.Transactions.Repositories;
 using MiniBank.Core.Domains.Users.Repositories;
+using MiniBank.Core;
 namespace MiniBank.Data
 {
     public static class Bootstraps

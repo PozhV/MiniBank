@@ -25,7 +25,7 @@ namespace MiniBank.Core.Domains.Accounts.Services
             {
                 throw new ValidationException("Не задано название валюты");
             }
-            if (String.IsNullOrEmpty(account.UserId))
+            if (account.UserId == Guid.Empty)
             {
                 throw new ValidationException("Не задан id пользователя, к которому будет привязан аккаунт");
             }
@@ -35,9 +35,9 @@ namespace MiniBank.Core.Domains.Accounts.Services
         {
             return _accountRepository.GetAll();
         }
-        public void Delete(string Id)
+        public void Delete(Guid Id)
         {
-            if (String.IsNullOrEmpty(Id))
+            if (Id == Guid.Empty)
                 throw new ValidationException("Id аккаунта не задан");
             _accountRepository.Delete(Id);
         }

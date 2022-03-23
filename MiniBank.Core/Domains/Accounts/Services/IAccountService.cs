@@ -9,7 +9,7 @@ namespace MiniBank.Core.Domains.Accounts.Services
     public interface IAccountService
     {
         Account Create(Account account);
-        void Delete(string UserId);
+        void Delete(Guid UserId);
         IEnumerable<Account> GetAll();
     }
 }

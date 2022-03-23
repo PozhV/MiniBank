@@ -8,11 +8,19 @@ namespace MiniBank.Data.Accounts.Repositories
 {
     public class AccountRepository : IAccountRepository
     {
-        public static Dictionary<string, AccountDbModel> _accounts = new Dictionary<string, AccountDbModel>();
+        public static Dictionary<Guid, AccountDbModel> _accounts = new Dictionary<Guid, AccountDbModel>();
         private readonly IRatesDatabase _ratesDatabase;
         public AccountRepository(IRatesDatabase ratesDatabase)
         {
             _ratesDatabase = ratesDatabase;
+        }
+        public string GetCurrencyName(Guid AccountId)
+        {
+            if (!_accounts.ContainsKey(AccountId))
+            {
+                throw new ValidationException("Одного из аккаунтов не существует");
+            }
+            return _accounts[AccountId].CurrencyName;
         }
         public Account Create(Account account)
         {
@@ -21,7 +29,7 @@ namespace MiniBank.Data.Accounts.Repositories
                 throw new ValidationException("Пользователя с таким Id не существует");
             }
             _ratesDatabase.CheckCurrencyName(account.CurrencyName);
-            string id = Guid.NewGuid().ToString();
+            Guid id = Guid.NewGuid();
             _accounts[id] = new AccountDbModel
             {
                 Id = id,
@@ -29,9 +37,10 @@ namespace MiniBank.Data.Accounts.Repositories
                 CurrencyName = account.CurrencyName,
                 Balance = account.Balance,
                 IsOpen = true,
-                OpenDate = DateTime.Now
+                OpenDate = DateTime.UtcNow
             };
             account.Id = id;
+            account.IsOpen = true;
             return account;
         }
         public IEnumerable<Account> GetAll()
@@ -45,7 +54,7 @@ namespace MiniBank.Data.Accounts.Repositories
                 IsOpen = it.Value.IsOpen
             });
         }
-        public void Delete(string id)
+        public void Delete(Guid id)
         {
             if(!_accounts.ContainsKey(id))
             {
@@ -59,7 +68,7 @@ namespace MiniBank.Data.Accounts.Repositories
                 });
             }
             _accounts[id].IsOpen = false;
-            _accounts[id].CloseDate = DateTime.Now;
+            _accounts[id].CloseDate = DateTime.UtcNow;
         }
         
     }

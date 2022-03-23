@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MiniBank.Data.Accounts.Repositories;
 using MiniBank.Core;
 using MiniBank.Core.Domains.Transactions;
+using MiniBank.Core.Domains.Users.UserMessages;
 using static MiniBank.Data.Accounts.Repositories.AccountRepository;
 namespace MiniBank.Data.Transactions.Repositories
 {
@@ -20,32 +21,31 @@ namespace MiniBank.Data.Transactions.Repositories
             _converter = converter;
             _rateDatabase = ratesDatabase;
         }
-        public void ExecuteTransaction(decimal amount, string fromAccountId, string toAccountId)
+        public void ExecuteTransaction(decimal fromAccountAmount, decimal toAccountAmount, Guid fromAccountId, Guid toAccountId)
         { 
-            decimal comission = CalculateComission(amount, fromAccountId, toAccountId);
-            if (_accounts[fromAccountId].Balance < amount)
+            if (_accounts[fromAccountId].Balance < fromAccountAmount)
             {
-                throw new ValidationException("На счете недостаточно средств для перевода");
+                throw new ValidationException("На счете недостаточно средств для перевода", new AccountExceptionMessage
+                {
+                    WrongBalance = _accounts[fromAccountId].Balance - fromAccountAmount,
+                });
             }
-            decimal rate = _rateDatabase.GetRate(_accounts[fromAccountId].CurrencyName, _accounts[toAccountId].CurrencyName);
-            decimal toAccountAmount = _converter.Convert(amount, rate);
-            _accounts[toAccountId].Balance += toAccountAmount - comission;
-            _accounts[fromAccountId].Balance -= amount;
+
+            _accounts[toAccountId].Balance += toAccountAmount;
+            _accounts[fromAccountId].Balance -= fromAccountAmount;
             _transactionStorage.Add(new TransactionDbModel
             {
-                TransactionId = Guid.NewGuid().ToString(),
+                TransactionId = Guid.NewGuid(),
                 Amount = toAccountAmount,
                 CurrencyName = _accounts[toAccountId].CurrencyName,
                 FromAccountId = fromAccountId,
                 ToAccountId = toAccountId
             });
         }
-        public decimal CalculateComission(decimal amount, string fromAccountId, string toAccountId)
+        public decimal CalculateComissionPercent(Guid fromAccountId, Guid toAccountId)
         {
-            if (!_accounts.ContainsKey(fromAccountId) || !_accounts.ContainsKey(toAccountId))
-            {
-                throw new ValidationException("Одного из аккаунтов не существует");
-            }
+            if(!_accounts.ContainsKey(fromAccountId) || !_accounts.ContainsKey(toAccountId))
+                throw new ValidationException("Одного из аккунтов не существует");
             if (!_accounts[fromAccountId].IsOpen || !_accounts[toAccountId].IsOpen)
             {
                 throw new ValidationException("Один из аккунтов закрыт");
@@ -54,8 +54,7 @@ namespace MiniBank.Data.Transactions.Repositories
             {
                 return 0;
             }
-            decimal rate = _rateDatabase.GetRate(_accounts[fromAccountId].CurrencyName, _accounts[toAccountId].CurrencyName);
-            return Decimal.Round(Convert.ToDecimal(0.02) * _converter.Convert(amount, rate), 2);
+            return Convert.ToDecimal(0.02);
         }
     }
 }

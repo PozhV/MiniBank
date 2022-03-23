@@ -35,7 +35,7 @@ namespace MiniBank.Core.Domains.Users.Services
         }
         public void Edit(User user)
         {
-            if(String.IsNullOrEmpty(user.UserId))
+            if(user.UserId == Guid.Empty)
             {
                 throw new ValidationException("Не задан Id");
             }
@@ -49,9 +49,9 @@ namespace MiniBank.Core.Domains.Users.Services
             }
             _userRepository.Edit(user);
         }
-        public void Delete(string id)
+        public void Delete(Guid id)
         {
-            if (String.IsNullOrEmpty(id))
+            if (id == Guid.Empty)
             {
                 throw new ValidationException("Не задан Id пользователя");
             }

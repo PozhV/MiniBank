@@ -9,7 +9,7 @@ using MiniBank.Core.Domains.Accounts;
 namespace MiniBank.Web.Controllers.Accounts
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[controller]/[action]", Name = "[controller]_[action]")]
     public class AccountController : ControllerBase
     {
         private readonly IAccountService _accountService;
@@ -20,7 +20,7 @@ namespace MiniBank.Web.Controllers.Accounts
             _transactionService = transactionService;
         }
 
-        [HttpPost(Name = "Create Account")]
+        [HttpPost]
         public Account CreateAccount(AccountDto model)
         {
             return _accountService.Create(new Account
@@ -30,12 +30,12 @@ namespace MiniBank.Web.Controllers.Accounts
                 Balance = model.Balance
             });
         }
-        [HttpGet("/GetAll")]
-        public IEnumerable<Account> GetAll()
+        [HttpGet]
+        public IEnumerable<Account> List()
         {
             return _accountService.GetAll();
         }
-        [HttpPut(Name = "Execute Transaction")]
+        [HttpPut]
         public void ExecuteTransaction([FromQuery]TransactionDto model)
         {
             _transactionService.ExecuteTransaction(new Transaction
@@ -45,8 +45,8 @@ namespace MiniBank.Web.Controllers.Accounts
                 ToAccountId = model.ToAccountId
             });
         }
-        [HttpGet(Name = "Calculate Comission")]
-        public decimal CalculateComission([FromQuery]TransactionDto model)
+        [HttpGet]
+        public decimal TransactionComission([FromQuery]TransactionDto model)
         {
             return _transactionService.CalculateComission(new Transaction
             {
@@ -55,8 +55,8 @@ namespace MiniBank.Web.Controllers.Accounts
                 ToAccountId = model.ToAccountId
             });
         }
-        [HttpDelete(Name = "Delete Account")]
-        public void DeleteAccount(string id)
+        [HttpDelete]
+        public void DeleteAccount(Guid id)
         {
             _accountService.Delete(id);
         }

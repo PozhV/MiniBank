@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Http;
 
-namespace MiniBank.Data
+namespace MiniBank.Core
 {
     
     public interface IRatesDatabase
