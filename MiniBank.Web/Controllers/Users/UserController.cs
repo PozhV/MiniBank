@@ -4,6 +4,8 @@ using MiniBank.Web.Controllers.Users.Dto;
 using MiniBank.Core.Domains.Users;
 using MiniBank.Core.Domains.Users.Services;
 using MiniBank.Data.Users;
+using MiniBank.Data;
+using Microsoft.EntityFrameworkCore;
 namespace MiniBank.Web.Controllers.Users
 {
     [ApiController]
@@ -11,14 +13,16 @@ namespace MiniBank.Web.Controllers.Users
     public class UserController
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        private readonly MiniBankContext _userContext;
+        public UserController(MiniBankContext userContext, IUserService userService)
         {
             _userService = userService;
+            _userContext = userContext;
         }
         [HttpPost]
-        public User Create(UserDto model)
+        public async Task<User> Create(UserDto model)
         {
-            return _userService.Create(new User
+            return await _userService.Create(new User
             {
                 Login = model.Login,
                 Email = model.Email
@@ -26,14 +30,14 @@ namespace MiniBank.Web.Controllers.Users
 
         }
         [HttpGet]
-        public IEnumerable<User> List()
+        public async Task<List<UserDbModel>> List()
         {
-            return _userService.GetAll();
+            return await _userContext.Users.ToListAsync();
         }
         [HttpPut]
-        public void Edit(Guid Id, [FromQuery]UserDto model)
+        public async Task Edit(Guid Id, [FromQuery]UserDto model)
         {
-            _userService.Edit(new User
+            await _userService.Edit(new User
             {
                 UserId = Id,
                 Login = model.Login,
@@ -41,9 +45,9 @@ namespace MiniBank.Web.Controllers.Users
             });
         }
         [HttpDelete]
-        public void Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            _userService.Delete(id);
+            await _userService.Delete(id);
         }
     }
 }

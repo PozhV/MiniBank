@@ -1,65 +1,78 @@
 ﻿using MiniBank.Core.Domains.Users;
 using MiniBank.Core.Domains.Users.Repositories;
 using MiniBank.Core;
-using static MiniBank.Data.Accounts.Repositories.AccountRepository;
+using Microsoft.EntityFrameworkCore;
 namespace MiniBank.Data.Users.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        public static Dictionary<Guid, UserDbModel> _userStorage = new Dictionary<Guid, UserDbModel>();
-        public void Edit(User user)
+        private readonly MiniBankContext _context;
+
+        public UserRepository(MiniBankContext context)
         {
-            if(!_userStorage.ContainsKey(user.UserId))
+            _context = context;
+        }
+        public async Task Edit(User user)
+        {
+            var entity = await _context.Users.FirstOrDefaultAsync(it => it.UserId == user.UserId);
+            if (entity == null)
             {
                 throw new ValidationException("Невозможно редактировать логин и email. Пользователя с таким Id не существует");
             }
-            _userStorage[user.UserId] = new UserDbModel
-            {
-                UserId = user.UserId,
-                Login = user.Login,
-                Email = user.Email
-            };
+            entity.Login = user.Login;
+            entity.Email = user.Email;
         }
-        public User Create(User user)
+        public async Task<User> Create(User user)
         {
-            var entity = _userStorage.FirstOrDefault(it => it.Value.Login == user.Login);
-            if (entity.Value != null)
+            var entity = await _context.Users.FirstOrDefaultAsync(it => it.Login == user.Login);
+            if (entity != null)
             {
                 throw new ValidationException("Невозможно добавить пользователя. Пользователь с таким логином уже существует");
             }
             Guid id = Guid.NewGuid();
-            _userStorage[id]= new UserDbModel
+            var userDb = new UserDbModel
             {
-                UserId = id,
+                UserId = Guid.NewGuid(),
                 Login = user.Login,
                 Email = user.Email
             };
+            await _context.Users.AddAsync(userDb);
             user.UserId = id;
             return user;
         }
-        public IEnumerable<User> GetAll()
+        public async Task Delete(Guid id)
         {
-            return _userStorage.Select(it => new User
-            {
-                UserId = it.Value.UserId,
-                Login = it.Value.Login,
-                Email = it.Value.Email
-            });
-        }
+            var entity = await _context.Users.FirstOrDefaultAsync(it => it.UserId == id);
 
-        public void Delete(Guid id)
-        {
-            if (!_userStorage.ContainsKey(id))
+            if (entity == null)
             {
                 throw new ValidationException("Пользователя с таким Id не существует");
             }
-            var  entity = _accounts.FirstOrDefault(it => it.Value.UserId == id && it.Value.IsOpen);
-            if (entity.Value != null)
+            var  ent = _context.Accounts.FirstOrDefault(it => it.UserId == id && it.IsOpen);
+            if (ent!= null)
             {
                 throw new ValidationException("Невозможно удалить пользователя. Есть незакрытые аккаунты");
             }
-            
-            _userStorage.Remove(id);
+            _context.Users.Remove(entity);
         }
+        public Task<bool> IsUserExists(Guid id)
+        {
+            var entity = _context.Users.FirstOrDefault(it => it.UserId == id);
+            if (entity == null)
+            {
+                return Task.FromResult(false);
+            }
+            return Task.FromResult(true);
+        }
+        /*/public async Task<List<User>> GetAll()
+        {
+            List<User> users = new List<User>();
+            return users.Select(it => new User()
+            {
+                UserId = it.UserId,
+                Login = it.Login,
+                Email= it.Email
+            }).ToList();
+         }/*/
     }
 }

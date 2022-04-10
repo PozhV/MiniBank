@@ -8,9 +8,11 @@ namespace MiniBank.Core.Domains.Accounts.Repositories
 {
     public interface IAccountRepository
     {
-        Account Create(Account account);
-        void Delete(Guid Id);
+        Task<Account> Create(Account account);
+        Task Delete(Guid Id);
         IEnumerable<Account> GetAll();
-        string GetCurrencyName(Guid Id);
+        Task<string> GetCurrencyName(Guid Id);
+        Task<bool> IsAccountExists(Guid Id);
+        Task<bool> IsAccountOpen (Guid Id);
     }
 }

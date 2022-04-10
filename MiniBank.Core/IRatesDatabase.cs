@@ -11,6 +11,6 @@ namespace MiniBank.Core
     public interface IRatesDatabase
     {
         void CheckCurrencyName(string currencyName);
-        decimal GetRate(string fromCurrency, string toCerrency);
+        Task<decimal> GetRate(string fromCurrency, string toCerrency);
     }
 }

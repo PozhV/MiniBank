@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using MiniBank.Data.HttpClients.Models;
 using MiniBank.Core;
 using MiniBank.Core.Domains.Users.UserMessages;
@@ -25,12 +26,11 @@ namespace MiniBank.Data
                 });
             }
         }
-        public decimal GetRate(string fromCurrency, string toCurrency)
+        public async Task<decimal> GetRate(string fromCurrency, string toCurrency)
         {
             CheckCurrencyName(fromCurrency);
             CheckCurrencyName(toCurrency);
-            var response = _httpClient.GetFromJsonAsync<RateResponse>("daily_json.js")
-      .GetAwaiter().GetResult();
+            var response = await _httpClient.GetFromJsonAsync<RateResponse>("daily_json.js");
             response.Valute.Add("RUB", new CurrencyItem { Rate = 1 });
             return Convert.ToDecimal(response.CurrencyRates[toCurrency].Rate / response.CurrencyRates[fromCurrency].Rate);
         }

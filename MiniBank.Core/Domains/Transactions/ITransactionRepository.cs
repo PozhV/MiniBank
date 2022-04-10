@@ -8,7 +8,7 @@ namespace MiniBank.Core.Domains.Transactions
 {
     public interface ITransactionRepository
     {
-        public void ExecuteTransaction(decimal fromAccountAmount, decimal toAccountAmount, Guid fromAccountId, Guid toAccountId);
-        public decimal CalculateComissionPercent(Guid fromAccountId, Guid toAccountId);
+        public Task ExecuteTransaction(decimal fromAccountAmount, decimal toAccountAmount, Guid fromAccountId, Guid toAccountId);
+        public Task<decimal> CalculateComissionPercent(Guid fromAccountId, Guid toAccountId);
     }
 }

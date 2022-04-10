@@ -5,57 +5,45 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using MiniBank.Core.Domains.Users.Repositories;
+using MiniBank.Core.Domains.Users.Validators;
+using FluentValidation;
 namespace MiniBank.Core.Domains.Users.Services
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<User> _userValidator;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IValidator<User> userValidator, IUnitOfWork unitOfWork, IUserRepository userRepository)
         {
             _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
+            _userValidator = userValidator;
         }
 
-        public IEnumerable<User> GetAll()
+        /*/public async Task<IEnumerable<User>> GetAll()
         {
-            return _userRepository.GetAll();
-        }
+           return await (_userRepository.GetAll());
+        }/*/
 
-        public User Create(User user)
+        public async Task<User> Create(User user)
         {
-            if (String.IsNullOrEmpty(user.Login))
-            {
-                throw new ValidationException("Не задан логин");
-            }
-            if(String.IsNullOrEmpty(user.Email))
-            {
-                throw new ValidationException("Не задан email");
-            }
-            return _userRepository.Create(user);
+            _userValidator.ValidateAndThrow(user);
+            var _user = await _userRepository.Create(user);
+            await _unitOfWork.SaveChangesAsync();
+            return _user;
         }
-        public void Edit(User user)
+        public async Task Edit(User user)
         {
-            if(user.UserId == Guid.Empty)
-            {
-                throw new ValidationException("Не задан Id");
-            }
-            if (String.IsNullOrEmpty(user.Login))
-            {
-                throw new ValidationException("Не задан логин");
-            }
-            if (String.IsNullOrEmpty(user.Email))
-            {
-                throw new ValidationException("Не задан email");
-            }
-            _userRepository.Edit(user);
+            _userValidator.ValidateAndThrow(user);
+            await _userRepository.Edit(user);
+            await _unitOfWork.SaveChangesAsync();
         }
-        public void Delete(Guid id)
+        public async Task Delete(Guid id)
         {
-            if (id == Guid.Empty)
-            {
-                throw new ValidationException("Не задан Id пользователя");
-            }
-            _userRepository.Delete(id);
+            await _userRepository.Delete(id);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 }

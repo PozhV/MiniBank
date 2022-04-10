@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FluentValidation;
 using MiniBank.Core.Domains.Users.UserMessages;
 using MiniBank.Core.Domains.Accounts.Repositories;
 using MiniBank.Core;
@@ -14,45 +15,38 @@ namespace MiniBank.Core.Domains.Transactions.Services
         private readonly IAccountRepository _accountRepository;
         private readonly IRatesDatabase _ratesDatabase;
         private readonly IConverter _converter;
-        public TransactionService(ITransactionRepository transactionRepository, IAccountRepository accountRepository, IRatesDatabase ratesDatabase, IConverter converter)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IValidator<Transaction> _transactionValidator;
+        public TransactionService(IValidator<Transaction> transactionValidator, IUnitOfWork unitOfWork, ITransactionRepository transactionRepository, 
+            IAccountRepository accountRepository, IRatesDatabase ratesDatabase, IConverter converter)
         {
+            _transactionValidator = transactionValidator;
+            _unitOfWork = unitOfWork;
             _transactionRepository = transactionRepository;
             _accountRepository = accountRepository;
             _ratesDatabase = ratesDatabase;
             _converter = converter;
         }
-        public void ExecuteTransaction(Transaction transaction)
+        public async Task ExecuteTransaction(Transaction transaction)
         {
-            if (transaction.FromAccountId == transaction.ToAccountId)
-            {
-                throw new ValidationException("Нельзя перевести деньги на тот же аккаунт");
-            }
-            string fromAccountCurrencyName = _accountRepository.GetCurrencyName(transaction.FromAccountId);
-            string toAccountCurrencyName = _accountRepository.GetCurrencyName( transaction.ToAccountId);
-            decimal comissionPercent = _transactionRepository.CalculateComissionPercent(transaction.FromAccountId, transaction.ToAccountId);
-            decimal rate = _ratesDatabase.GetRate(fromAccountCurrencyName, toAccountCurrencyName);
-            decimal toAccountAmount = Decimal.Round(_converter.Convert(transaction.Amount, rate) * (1 - comissionPercent), 2);
+            _transactionValidator.ValidateAndThrow(transaction);
+            decimal comissionPercent = await _transactionRepository.CalculateComissionPercent(
+                transaction.FromAccountId, transaction.ToAccountId);
+            string fromAccountCurrencyName = await _accountRepository.GetCurrencyName(transaction.FromAccountId);
+            string toAccountCurrencyName = await _accountRepository.GetCurrencyName(transaction.ToAccountId);
+            decimal rate = await _ratesDatabase.GetRate(
+                fromAccountCurrencyName, toAccountCurrencyName);
+            decimal toAccountAmount = Decimal.Round(
+                _converter.Convert(transaction.Amount, rate) * (1 - comissionPercent), 2);
 
-            _transactionRepository.ExecuteTransaction(transaction.Amount, toAccountAmount, transaction.FromAccountId, transaction.ToAccountId);
+            await _transactionRepository.ExecuteTransaction(transaction.Amount, toAccountAmount,
+                transaction.FromAccountId, transaction.ToAccountId);
+            await _unitOfWork.SaveChangesAsync();
         }
-        public decimal CalculateComission(Transaction transaction)
+        public async Task<decimal> CalculateComission(Transaction transaction)
         {
-            if (transaction.Amount <= 0)
-            {
-                throw new ValidationException("Cумма перевода должна быть больше нуля", new TransactionExceptionMessage()
-                {
-                    WrongAmount = transaction.Amount
-                });
-            }
-            if (transaction.FromAccountId == Guid.Empty)
-            {
-                throw new ValidationException("Не задан id аккаунта, с которого будет совершен перевод");
-            }
-            if (transaction.ToAccountId == Guid.Empty)
-            {
-                throw new ValidationException("Не задан id аккаунта, на который будет совершен перевод");
-            }
-            decimal comissionPercent = _transactionRepository.CalculateComissionPercent(transaction.FromAccountId, transaction.ToAccountId);
+            _transactionValidator.ValidateAndThrow(transaction);
+            decimal comissionPercent = await _transactionRepository.CalculateComissionPercent(transaction.FromAccountId, transaction.ToAccountId);
             return Decimal.Round(comissionPercent * transaction.Amount, 2);
         }
     }

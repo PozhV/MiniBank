@@ -8,9 +8,10 @@ namespace MiniBank.Core.Domains.Users.Repositories
 {
     public interface IUserRepository
     {
-        IEnumerable<User> GetAll();
-        User Create(User user);
-        void Delete(Guid id);
-        void Edit(User user);
+        //Task<IEnumerable<User>> GetAll();
+        Task<User> Create(User user);
+        Task Delete(Guid id);
+        Task Edit(User user);
+        Task<bool> IsUserExists(Guid id);
     }
 }

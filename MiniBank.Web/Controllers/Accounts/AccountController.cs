@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MiniBank.Core.Domains.Accounts.Services;
 using MiniBank.Web.Controllers.Accounts.Dto;
 using MiniBank.Web.Controllers.Transactions.Dto;
 using MiniBank.Core.Domains.Transactions;
 using MiniBank.Core.Domains.Transactions.Services;
 using MiniBank.Core.Domains.Accounts;
+using MiniBank.Data.Accounts;
+using MiniBank.Data;
 namespace MiniBank.Web.Controllers.Accounts
 {
     [ApiController]
@@ -14,16 +17,18 @@ namespace MiniBank.Web.Controllers.Accounts
     {
         private readonly IAccountService _accountService;
         private readonly ITransactionService _transactionService;
-        public AccountController(IAccountService accountService, ITransactionService transactionService)
+        private readonly MiniBankContext _accountContext;
+        public AccountController(MiniBankContext accountContext, IAccountService accountService, ITransactionService transactionService)
         {
+            _accountContext = accountContext;
             _accountService = accountService;
             _transactionService = transactionService;
         }
 
         [HttpPost]
-        public Account CreateAccount(AccountDto model)
+        public async Task<Account> CreateAccount(AccountDto model)
         {
-            return _accountService.Create(new Account
+            return await _accountService.Create(new Account
             {
                 UserId = model.UserId,
                 CurrencyName = model.CurrencyName,
@@ -31,14 +36,14 @@ namespace MiniBank.Web.Controllers.Accounts
             });
         }
         [HttpGet]
-        public IEnumerable<Account> List()
+        public async Task<List<AccountDbModel>> List()
         {
-            return _accountService.GetAll();
+            return await _accountContext.Accounts.ToListAsync();
         }
         [HttpPut]
-        public void ExecuteTransaction([FromQuery]TransactionDto model)
+        public async Task ExecuteTransaction([FromQuery]TransactionDto model)
         {
-            _transactionService.ExecuteTransaction(new Transaction
+            await _transactionService.ExecuteTransaction(new Transaction
             {
                 Amount = model.Amount,
                 FromAccountId = model.FromAccountId,
@@ -46,9 +51,9 @@ namespace MiniBank.Web.Controllers.Accounts
             });
         }
         [HttpGet]
-        public decimal TransactionComission([FromQuery]TransactionDto model)
+        public async Task<decimal> TransactionComission([FromQuery]TransactionDto model)
         {
-            return _transactionService.CalculateComission(new Transaction
+            return await _transactionService.CalculateComission(new Transaction
             {
                 Amount = model.Amount,
                 FromAccountId = model.FromAccountId,
@@ -56,9 +61,9 @@ namespace MiniBank.Web.Controllers.Accounts
             });
         }
         [HttpDelete]
-        public void DeleteAccount(Guid id)
+        public async Task DeleteAccount(Guid id)
         {
-            _accountService.Delete(id);
+            await _accountService.Delete(id);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace MiniBank.Core.Domains.Transactions.Services
 {
     public interface ITransactionService
     {
-        public void ExecuteTransaction(Transaction transaction);
-        public decimal CalculateComission(Transaction transaction);
+        public Task ExecuteTransaction(Transaction transaction);
+        public Task<decimal> CalculateComission(Transaction transaction);
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using MiniBank.Data.Accounts.Repositories;
 using MiniBank.Core;
 using MiniBank.Core.Domains.Transactions;
@@ -13,44 +14,43 @@ namespace MiniBank.Data.Transactions.Repositories
 
     public class TransactionRepository : ITransactionRepository
     {
-        private static List<TransactionDbModel> _transactionStorage = new List<TransactionDbModel>();
         private readonly IConverter _converter;
         private readonly IRatesDatabase _rateDatabase;
-        public TransactionRepository(IConverter converter, IRatesDatabase ratesDatabase)
+        private readonly MiniBankContext _context;
+        public TransactionRepository(MiniBankContext context, IConverter converter, IRatesDatabase ratesDatabase)
         {
+            _context = context;
             _converter = converter;
             _rateDatabase = ratesDatabase;
         }
-        public void ExecuteTransaction(decimal fromAccountAmount, decimal toAccountAmount, Guid fromAccountId, Guid toAccountId)
-        { 
-            if (_accounts[fromAccountId].Balance < fromAccountAmount)
+        public async Task ExecuteTransaction(decimal fromAccountAmount, decimal toAccountAmount, Guid fromAccountId, Guid toAccountId)
+        {
+            var entityFrom = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == fromAccountId);
+            var entityTo = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == toAccountId);
+            if (entityFrom.Balance < fromAccountAmount)
             {
                 throw new ValidationException("На счете недостаточно средств для перевода", new AccountExceptionMessage
                 {
-                    WrongBalance = _accounts[fromAccountId].Balance - fromAccountAmount,
+                    WrongBalance = entityFrom.Balance - fromAccountAmount,
                 });
             }
 
-            _accounts[toAccountId].Balance += toAccountAmount;
-            _accounts[fromAccountId].Balance -= fromAccountAmount;
-            _transactionStorage.Add(new TransactionDbModel
+            entityTo.Balance += toAccountAmount;
+            entityFrom.Balance -= fromAccountAmount;
+            await _context.Transactions.AddAsync(new TransactionDbModel
             {
                 TransactionId = Guid.NewGuid(),
                 Amount = toAccountAmount,
-                CurrencyName = _accounts[toAccountId].CurrencyName,
+                CurrencyName = entityTo.CurrencyName,
                 FromAccountId = fromAccountId,
                 ToAccountId = toAccountId
             });
         }
-        public decimal CalculateComissionPercent(Guid fromAccountId, Guid toAccountId)
+        public async Task<decimal> CalculateComissionPercent(Guid fromAccountId, Guid toAccountId)
         {
-            if(!_accounts.ContainsKey(fromAccountId) || !_accounts.ContainsKey(toAccountId))
-                throw new ValidationException("Одного из аккунтов не существует");
-            if (!_accounts[fromAccountId].IsOpen || !_accounts[toAccountId].IsOpen)
-            {
-                throw new ValidationException("Один из аккунтов закрыт");
-            }
-            if (_accounts[fromAccountId].UserId == _accounts[toAccountId].UserId)
+            var entityFrom = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == fromAccountId);
+            var entityTo = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == toAccountId);
+            if (entityFrom.UserId == entityTo.UserId)
             {
                 return 0;
             }

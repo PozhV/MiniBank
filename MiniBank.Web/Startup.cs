@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Http;
 using System.Net.Http;
 using MiniBank.Data.Users.Repositories;
 using MiniBank.Core.Domains.Users.Repositories;
+using MiniBank.Web.HostedServices;
 using System.Diagnostics;
 using Microsoft.OpenApi.Models;
 
@@ -39,14 +40,14 @@ namespace MiniBank.Web
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "MiniBank.Web", Version = "v1" });
             });
 
-                services.AddData(Configuration).AddCore();
+            services.AddHostedService<MigrationHostedService>();
+            services.AddData(Configuration).AddCore();
 
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMiddleware<ExceptionMiddleware>();
-            app.UseMiddleware<ValidationExceptionMiddleware>();
             if (env.IsDevelopment())
             {
                 app.UseSwagger();

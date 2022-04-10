@@ -1,4 +1,5 @@
-﻿using MiniBank.Core.Domains.Accounts.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using MiniBank.Core.Domains.Accounts.Repositories;
 using MiniBank.Core;
 using MiniBank.Core.Domains.Accounts;
 using MiniBank.Data.HttpClients;
@@ -8,29 +9,24 @@ namespace MiniBank.Data.Accounts.Repositories
 {
     public class AccountRepository : IAccountRepository
     {
-        public static Dictionary<Guid, AccountDbModel> _accounts = new Dictionary<Guid, AccountDbModel>();
         private readonly IRatesDatabase _ratesDatabase;
-        public AccountRepository(IRatesDatabase ratesDatabase)
+        private readonly MiniBankContext _context;
+        public AccountRepository(MiniBankContext context, IRatesDatabase ratesDatabase)
         {
             _ratesDatabase = ratesDatabase;
+            _context = context;
         }
-        public string GetCurrencyName(Guid AccountId)
+        public async Task<string> GetCurrencyName(Guid AccountId)
         {
-            if (!_accounts.ContainsKey(AccountId))
-            {
-                throw new ValidationException("Одного из аккаунтов не существует");
-            }
-            return _accounts[AccountId].CurrencyName;
+            var entity = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == AccountId);
+            return entity.CurrencyName;
         }
-        public Account Create(Account account)
+        public async Task<Account> Create(Account account)
         {
-            if (!_userStorage.ContainsKey(account.UserId))
-            {
-                throw new ValidationException("Пользователя с таким Id не существует");
-            }
+            var entity = await _context.Accounts.FirstOrDefaultAsync(it => it.UserId == account.UserId);
             _ratesDatabase.CheckCurrencyName(account.CurrencyName);
             Guid id = Guid.NewGuid();
-            _accounts[id] = new AccountDbModel
+            await _context.Accounts.AddAsync(new AccountDbModel
             {
                 Id = id,
                 UserId = account.UserId,
@@ -38,38 +34,62 @@ namespace MiniBank.Data.Accounts.Repositories
                 Balance = account.Balance,
                 IsOpen = true,
                 OpenDate = DateTime.UtcNow
-            };
+            });
             account.Id = id;
             account.IsOpen = true;
             return account;
         }
-        public IEnumerable<Account> GetAll()
+        
+        public async Task Delete(Guid id)
         {
-            return _accounts.Select(it => new Account
-            {
-                Id = it.Value.Id,
-                UserId = it.Value.UserId,
-                Balance = it.Value.Balance,
-                CurrencyName=it.Value.CurrencyName,
-                IsOpen = it.Value.IsOpen
-            });
-        }
-        public void Delete(Guid id)
-        {
-            if(!_accounts.ContainsKey(id))
+            var entity = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == id);
+            if (entity == null)
             {
                 throw new ValidationException("Аккаунта с таким Id не существует");  
             }
-            if(_accounts[id].Balance > 0)
+            if(!entity.IsOpen)
+            {
+                throw new ValidationException("Аккаунт с таким Id уже закрыт");
+            }
+            if(entity.Balance > 0)
             {
                 throw new ValidationException("Невозможно удалить аккаунт. Сумма на счете больше нуля", new AccountExceptionMessage()
                 {
-                    WrongBalance = _accounts[id].Balance
+                    WrongBalance = entity.Balance
                 });
             }
-            _accounts[id].IsOpen = false;
-            _accounts[id].CloseDate = DateTime.UtcNow;
+            entity.IsOpen = false;
+            entity.CloseDate = DateTime.UtcNow;
         }
-        
+        public async Task<bool> IsAccountExists(Guid id)
+        {
+            var entity = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == id);
+            if (entity == null)
+            {
+                return false;
+            }
+            return true;
+        }
+        public async Task<bool> IsAccountOpen(Guid id)
+        {
+            var entity = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == id && it.IsOpen);
+            if (entity == null)
+            {
+                return false;
+            }
+            return true;
+        }
+        public IEnumerable<Account> GetAll()
+        {
+            return _context.Accounts.Select(it => new Account
+            {
+                Id = it.Id,
+                UserId = it.UserId,
+                Balance = it.Balance,
+                CurrencyName = it.CurrencyName,
+                IsOpen = it.IsOpen
+            });
+        }
+
     }
 }

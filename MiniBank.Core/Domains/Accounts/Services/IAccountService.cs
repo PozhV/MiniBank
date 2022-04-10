@@ -8,8 +8,8 @@ namespace MiniBank.Core.Domains.Accounts.Services
 {
     public interface IAccountService
     {
-        Account Create(Account account);
-        void Delete(Guid UserId);
+        Task<Account> Create(Account account);
+        Task Delete(Guid UserId);
         IEnumerable<Account> GetAll();
     }
 }
