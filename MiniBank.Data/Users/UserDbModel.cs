@@ -16,7 +16,7 @@ namespace MiniBank.Data.Users
         {
             public void Configure(EntityTypeBuilder<UserDbModel> builder)
             {
-                builder.ToTable("UserDb");
+                builder.ToTable("users");
                 builder.Property(it => it.UserId);
                 builder.Property(it => it.Login);
 

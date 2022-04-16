@@ -33,7 +33,7 @@ namespace MiniBank.Data.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("balance");
 
-                    b.Property<DateTime>("CloseDate")
+                    b.Property<DateTime?>("CloseDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("close_date");
 
@@ -55,9 +55,9 @@ namespace MiniBank.Data.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
-                        .HasName("pk_account_db");
+                        .HasName("pk_accounts");
 
-                    b.ToTable("AccountDb", (string)null);
+                    b.ToTable("accounts", (string)null);
                 });
 
             modelBuilder.Entity("MiniBank.Data.Transactions.TransactionDbModel", b =>
@@ -85,9 +85,9 @@ namespace MiniBank.Data.Migrations
                         .HasColumnName("to_account_id");
 
                     b.HasKey("TransactionId")
-                        .HasName("pk_transaction_db");
+                        .HasName("pk_transactions");
 
-                    b.ToTable("TransactionDb", (string)null);
+                    b.ToTable("transactions", (string)null);
                 });
 
             modelBuilder.Entity("MiniBank.Data.Users.UserDbModel", b =>
@@ -108,9 +108,9 @@ namespace MiniBank.Data.Migrations
                         .HasColumnName("login");
 
                     b.HasKey("UserId")
-                        .HasName("pk_user_db");
+                        .HasName("pk_users");
 
-                    b.ToTable("UserDb", (string)null);
+                    b.ToTable("users", (string)null);
                 });
 #pragma warning restore 612, 618
         }

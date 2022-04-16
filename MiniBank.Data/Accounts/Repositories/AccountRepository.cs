@@ -79,7 +79,7 @@ namespace MiniBank.Data.Accounts.Repositories
             }
             return true;
         }
-        public IEnumerable<Account> GetAll()
+        public Task<List<Account>> GetAll()
         {
             return _context.Accounts.Select(it => new Account
             {
@@ -88,7 +88,7 @@ namespace MiniBank.Data.Accounts.Repositories
                 Balance = it.Balance,
                 CurrencyName = it.CurrencyName,
                 IsOpen = it.IsOpen
-            });
+            }).ToListAsync();
         }
 
     }

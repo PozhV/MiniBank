@@ -18,21 +18,13 @@ namespace MiniBank.Web.HostedServices
         }
 
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var context = scope.ServiceProvider.GetService<MiniBankContext>();
-
-                if (context == null)
-                {
-                    throw new Exception($"{nameof(MiniBankContext)} not registered");
-                }
-
-                context.Database.Migrate();
+                var context = scope.ServiceProvider.GetRequiredService<MiniBankContext>();
+                await context.Database.MigrateAsync();
             }
-
-            return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

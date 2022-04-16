@@ -22,10 +22,10 @@ namespace MiniBank.Core.Domains.Users.Services
             _userValidator = userValidator;
         }
 
-        /*/public async Task<IEnumerable<User>> GetAll()
+        public async Task<List<User>> GetAll()
         {
-           return await (_userRepository.GetAll());
-        }/*/
+           return await _userRepository.GetAll();
+        }
 
         public async Task<User> Create(User user)
         {

@@ -10,6 +10,6 @@ namespace MiniBank.Core.Domains.Accounts.Services
     {
         Task<Account> Create(Account account);
         Task Delete(Guid UserId);
-        IEnumerable<Account> GetAll();
+        Task<List<Account>> GetAll();
     }
 }

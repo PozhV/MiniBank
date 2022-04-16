@@ -9,6 +9,8 @@ using MiniBank.Data.Transactions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using EFCore.NamingConventions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Migrations.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -58,10 +60,13 @@ namespace MiniBank.Data
     {
         public MiniBankContext CreateDbContext(string[] args)
         {
+            IConfiguration config = new ConfigurationBuilder()
+                .SetBasePath(Path.Combine(Directory.GetCurrentDirectory(), "../MiniBank.Web"))
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
             var options = new DbContextOptionsBuilder()
-                .UseNpgsql("Host=localhost;Port=5432;Database=MiniBankDemo;Username=postgres;Password=19992806ru").ReplaceService<IHistoryRepository, CamelCaseHistoryContext>()
- .UseSnakeCaseNamingConvention().Options;
-
+                .UseNpgsql(config["DbConnectionString"]).ReplaceService<IHistoryRepository, CamelCaseHistoryContext>()
+                .UseSnakeCaseNamingConvention().Options;
             return new MiniBankContext(options);
         }
     }

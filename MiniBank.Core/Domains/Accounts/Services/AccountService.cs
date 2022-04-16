@@ -27,9 +27,9 @@ namespace MiniBank.Core.Domains.Accounts.Services
             await _unitOfWork.SaveChangesAsync();
             return _account;
         }
-        public IEnumerable<Account> GetAll()
+        public async Task<List<Account>> GetAll()
         {
-            return _accountRepository.GetAll();
+            return await _accountRepository.GetAll();
         }
         public async Task Delete(Guid Id)
         {

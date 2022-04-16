@@ -13,11 +13,9 @@ namespace MiniBank.Web.Controllers.Users
     public class UserController
     {
         private readonly IUserService _userService;
-        private readonly MiniBankContext _userContext;
-        public UserController(MiniBankContext userContext, IUserService userService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _userContext = userContext;
         }
         [HttpPost]
         public async Task<User> Create(UserDto model)
@@ -30,9 +28,9 @@ namespace MiniBank.Web.Controllers.Users
 
         }
         [HttpGet]
-        public async Task<List<UserDbModel>> List()
+        public async Task<List<User>> List()
         {
-            return await _userContext.Users.ToListAsync();
+            return await _userService.GetAll();
         }
         [HttpPut]
         public async Task Edit(Guid Id, [FromQuery]UserDto model)

@@ -64,15 +64,14 @@ namespace MiniBank.Data.Users.Repositories
             }
             return Task.FromResult(true);
         }
-        /*/public async Task<List<User>> GetAll()
+        public async Task<List<User>> GetAll()
         {
-            List<User> users = new List<User>();
-            return users.Select(it => new User()
+            return await _context.Users.Select(it => new User()
             {
                 UserId = it.UserId,
                 Login = it.Login,
                 Email= it.Email
-            }).ToList();
-         }/*/
+            }).ToListAsync();
+         }
     }
 }

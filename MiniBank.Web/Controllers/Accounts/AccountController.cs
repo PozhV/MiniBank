@@ -17,10 +17,8 @@ namespace MiniBank.Web.Controllers.Accounts
     {
         private readonly IAccountService _accountService;
         private readonly ITransactionService _transactionService;
-        private readonly MiniBankContext _accountContext;
-        public AccountController(MiniBankContext accountContext, IAccountService accountService, ITransactionService transactionService)
+        public AccountController(IAccountService accountService, ITransactionService transactionService)
         {
-            _accountContext = accountContext;
             _accountService = accountService;
             _transactionService = transactionService;
         }
@@ -36,9 +34,9 @@ namespace MiniBank.Web.Controllers.Accounts
             });
         }
         [HttpGet]
-        public async Task<List<AccountDbModel>> List()
+        public async Task<List<Account>> List()
         {
-            return await _accountContext.Accounts.ToListAsync();
+            return await _accountService.GetAll();
         }
         [HttpPut]
         public async Task ExecuteTransaction([FromQuery]TransactionDto model)

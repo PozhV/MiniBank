@@ -25,7 +25,7 @@ namespace MiniBank.Data.Transactions
         {
             public void Configure(EntityTypeBuilder<TransactionDbModel> builder)
             {
-                builder.ToTable("TransactionDb");
+                builder.ToTable("transactions");
 
                 builder.Property(it => it.TransactionId);
                 builder.Property(it => it.CurrencyName);

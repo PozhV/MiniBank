@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MiniBank.Data.Migrations
 {
     [DbContext(typeof(MiniBankContext))]
-    [Migration("20220410222929_Init4")]
-    partial class Init4
+    [Migration("20220416180022_Create_Tables_users_transactions_accounts")]
+    partial class Create_Tables_users_transactions_accounts
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -35,7 +35,7 @@ namespace MiniBank.Data.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("balance");
 
-                    b.Property<DateTime>("CloseDate")
+                    b.Property<DateTime?>("CloseDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("close_date");
 
@@ -87,9 +87,9 @@ namespace MiniBank.Data.Migrations
                         .HasColumnName("to_account_id");
 
                     b.HasKey("TransactionId")
-                        .HasName("pk_transaction_db");
+                        .HasName("pk_transactions");
 
-                    b.ToTable("TransactionDb", (string)null);
+                    b.ToTable("transactions", (string)null);
                 });
 
             modelBuilder.Entity("MiniBank.Data.Users.UserDbModel", b =>
@@ -110,9 +110,9 @@ namespace MiniBank.Data.Migrations
                         .HasColumnName("login");
 
                     b.HasKey("UserId")
-                        .HasName("pk_user_db");
+                        .HasName("pk_users");
 
-                    b.ToTable("UserDb", (string)null);
+                    b.ToTable("users", (string)null);
                 });
 #pragma warning restore 612, 618
         }

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MiniBank.Data.Migrations
 {
-    public partial class Init1 : Migration
+    public partial class Create_Tables_users_transactions_accounts : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -19,7 +19,7 @@ namespace MiniBank.Data.Migrations
                     currency_name = table.Column<string>(type: "text", nullable: false),
                     is_open = table.Column<bool>(type: "boolean", nullable: false),
                     open_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    close_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    close_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -27,7 +27,7 @@ namespace MiniBank.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Transaction",
+                name: "transactions",
                 columns: table => new
                 {
                     transaction_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -38,11 +38,11 @@ namespace MiniBank.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_transaction", x => x.transaction_id);
+                    table.PrimaryKey("pk_transactions", x => x.transaction_id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "users",
                 columns: table => new
                 {
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -51,7 +51,7 @@ namespace MiniBank.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_user", x => x.user_id);
+                    table.PrimaryKey("pk_users", x => x.user_id);
                 });
         }
 
@@ -61,10 +61,10 @@ namespace MiniBank.Data.Migrations
                 name: "accounts");
 
             migrationBuilder.DropTable(
-                name: "Transaction");
+                name: "transactions");
 
             migrationBuilder.DropTable(
-                name: "User");
+                name: "users");
         }
     }
 }

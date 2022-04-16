@@ -8,7 +8,7 @@ namespace MiniBank.Core.Domains.Users.Services
 {
     public interface IUserService
     {
-        //Task<IEnumerable<User>> GetAll();
+        Task<List<User>> GetAll();
         Task<User> Create(User user);
         Task Delete(Guid id);
         Task Edit(User user);

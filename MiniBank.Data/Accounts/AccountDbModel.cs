@@ -19,12 +19,12 @@ namespace MiniBank.Data.Accounts
         [Column("open_date")]
         public DateTime OpenDate { get; set; }
         [Column("close_date")]
-        public DateTime CloseDate { get; set; }
+        public DateTime? CloseDate { get; set; }
         internal class Map : IEntityTypeConfiguration<AccountDbModel>
         {
             public void Configure(EntityTypeBuilder<AccountDbModel> builder)
             {
-                builder.ToTable("AccountDb");
+                builder.ToTable("accounts");
                 builder.Property(it => it.Id);
                 builder.Property(it => it.Balance);
                 builder.Property(it => it.CurrencyName);
