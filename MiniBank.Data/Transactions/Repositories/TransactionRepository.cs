@@ -14,14 +14,10 @@ namespace MiniBank.Data.Transactions.Repositories
 
     public class TransactionRepository : ITransactionRepository
     {
-        private readonly IConverter _converter;
-        private readonly IRatesDatabase _rateDatabase;
         private readonly MiniBankContext _context;
         public TransactionRepository(MiniBankContext context, IConverter converter, IRatesDatabase ratesDatabase)
         {
             _context = context;
-            _converter = converter;
-            _rateDatabase = ratesDatabase;
         }
         public async Task ExecuteTransaction(decimal fromAccountAmount, decimal toAccountAmount, Guid fromAccountId, Guid toAccountId)
         {
@@ -50,6 +46,15 @@ namespace MiniBank.Data.Transactions.Repositories
         {
             var entityFrom = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == fromAccountId);
             var entityTo = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == toAccountId);
+            if (entityFrom == null || entityTo == null)
+            {
+                throw new ValidationException("Одного из аккунтов не существует");
+            }
+            if (! entityTo.IsOpen || !entityTo.IsOpen)
+            {
+                throw new ValidationException("Один из аккунтов закрыт");
+            }
+
             if (entityFrom.UserId == entityTo.UserId)
             {
                 return 0;

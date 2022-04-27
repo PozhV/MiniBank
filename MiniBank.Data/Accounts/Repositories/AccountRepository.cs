@@ -23,7 +23,11 @@ namespace MiniBank.Data.Accounts.Repositories
         }
         public async Task<Account> Create(Account account)
         {
-            var entity = await _context.Accounts.FirstOrDefaultAsync(it => it.UserId == account.UserId);
+            var entity = await _context.Users.FirstOrDefaultAsync(it => it.UserId == account.UserId);
+            if(entity == null)
+            {
+                throw new ValidationException("Пользователя с таким Id не существует");
+            }
             _ratesDatabase.CheckCurrencyName(account.CurrencyName);
             Guid id = Guid.NewGuid();
             await _context.Accounts.AddAsync(new AccountDbModel
@@ -61,24 +65,7 @@ namespace MiniBank.Data.Accounts.Repositories
             entity.IsOpen = false;
             entity.CloseDate = DateTime.UtcNow;
         }
-        public async Task<bool> IsAccountExists(Guid id)
-        {
-            var entity = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == id);
-            if (entity == null)
-            {
-                return false;
-            }
-            return true;
-        }
-        public async Task<bool> IsAccountOpen(Guid id)
-        {
-            var entity = await _context.Accounts.FirstOrDefaultAsync(it => it.Id == id && it.IsOpen);
-            if (entity == null)
-            {
-                return false;
-            }
-            return true;
-        }
+        
         public Task<List<Account>> GetAll()
         {
             return _context.Accounts.Select(it => new Account

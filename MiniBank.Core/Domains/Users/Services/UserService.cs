@@ -29,7 +29,7 @@ namespace MiniBank.Core.Domains.Users.Services
 
         public async Task<User> Create(User user)
         {
-            _userValidator.ValidateAndThrow(user);
+            await _userValidator.ValidateAndThrowAsync(user);
             var _user = await _userRepository.Create(user);
             await _unitOfWork.SaveChangesAsync();
             return _user;
@@ -41,7 +41,7 @@ namespace MiniBank.Core.Domains.Users.Services
             await _unitOfWork.SaveChangesAsync();
         }
         public async Task Delete(Guid id)
-        {
+        {  
             await _userRepository.Delete(id);
             await _unitOfWork.SaveChangesAsync();
         }

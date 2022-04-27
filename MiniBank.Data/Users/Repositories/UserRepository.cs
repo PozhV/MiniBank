@@ -42,27 +42,32 @@ namespace MiniBank.Data.Users.Repositories
         }
         public async Task Delete(Guid id)
         {
-            var entity = await _context.Users.FirstOrDefaultAsync(it => it.UserId == id);
-
-            if (entity == null)
+            if (! await IsUserExists(id))
             {
                 throw new ValidationException("Пользователя с таким Id не существует");
             }
-            var  ent = _context.Accounts.FirstOrDefault(it => it.UserId == id && it.IsOpen);
+            var entity = await GetUserById(id);
+
+
+            var  ent = await _context.Accounts.FirstOrDefaultAsync(it => it.UserId == id && it.IsOpen);
             if (ent!= null)
             {
                 throw new ValidationException("Невозможно удалить пользователя. Есть незакрытые аккаунты");
             }
             _context.Users.Remove(entity);
         }
-        public Task<bool> IsUserExists(Guid id)
+        public async Task<UserDbModel?> GetUserById(Guid id)
         {
-            var entity = _context.Users.FirstOrDefault(it => it.UserId == id);
+            return await _context.Users.FirstOrDefaultAsync(it => it.UserId == id);
+        }
+        public async Task<bool> IsUserExists(Guid id)
+        {
+            var entity = await _context.Users.FirstOrDefaultAsync(it => it.UserId == id);
             if (entity == null)
             {
-                return Task.FromResult(false);
+                return false;
             }
-            return Task.FromResult(true);
+            return true;
         }
         public async Task<List<User>> GetAll()
         {
@@ -73,5 +78,14 @@ namespace MiniBank.Data.Users.Repositories
                 Email= it.Email
             }).ToListAsync();
          }
+        public async Task<bool> ContainsByLogin(string login)
+        {
+            var entity = await _context.Users.FirstOrDefaultAsync(it => it.Login == login);
+            if (entity == null)
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }

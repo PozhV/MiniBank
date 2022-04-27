@@ -12,7 +12,5 @@ namespace MiniBank.Core.Domains.Accounts.Repositories
         Task Delete(Guid Id);
         Task<List<Account>> GetAll();
         Task<string> GetCurrencyName(Guid Id);
-        Task<bool> IsAccountExists(Guid Id);
-        Task<bool> IsAccountOpen (Guid Id);
     }
 }

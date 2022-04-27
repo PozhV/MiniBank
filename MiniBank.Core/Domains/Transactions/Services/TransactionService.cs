@@ -32,15 +32,17 @@ namespace MiniBank.Core.Domains.Transactions.Services
             _transactionValidator.ValidateAndThrow(transaction);
             decimal comissionPercent = await _transactionRepository.CalculateComissionPercent(
                 transaction.FromAccountId, transaction.ToAccountId);
+
             string fromAccountCurrencyName = await _accountRepository.GetCurrencyName(transaction.FromAccountId);
             string toAccountCurrencyName = await _accountRepository.GetCurrencyName(transaction.ToAccountId);
-            decimal rate = await _ratesDatabase.GetRate(
-                fromAccountCurrencyName, toAccountCurrencyName);
+
+            decimal rate = await _ratesDatabase.GetRate(fromAccountCurrencyName, toAccountCurrencyName);
             decimal toAccountAmount = Decimal.Round(
                 _converter.Convert(transaction.Amount, rate) * (1 - comissionPercent), 2);
 
             await _transactionRepository.ExecuteTransaction(transaction.Amount, toAccountAmount,
                 transaction.FromAccountId, transaction.ToAccountId);
+
             await _unitOfWork.SaveChangesAsync();
         }
         public async Task<decimal> CalculateComission(Transaction transaction)
