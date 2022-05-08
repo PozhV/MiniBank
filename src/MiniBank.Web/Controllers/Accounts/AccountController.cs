@@ -1,16 +1,15 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using MiniBank.Core.Domains.Accounts.Services;
 using MiniBank.Web.Controllers.Accounts.Dto;
 using MiniBank.Web.Controllers.Transactions.Dto;
 using MiniBank.Core.Domains.Transactions;
 using MiniBank.Core.Domains.Transactions.Services;
 using MiniBank.Core.Domains.Accounts;
-using MiniBank.Data.Accounts;
-using MiniBank.Data;
+using Microsoft.AspNetCore.Authorization;
+
 namespace MiniBank.Web.Controllers.Accounts
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]/[action]", Name = "[controller]_[action]")]
     public class AccountController : ControllerBase

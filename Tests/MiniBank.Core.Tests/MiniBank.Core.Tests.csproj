@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MiniBank.Data\MiniBank.Data.csproj" />
+    <ProjectReference Include="..\..\src\MiniBank.Core\MiniBank.Core.csproj" />
   </ItemGroup>
 
 </Project>

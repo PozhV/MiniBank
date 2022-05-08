@@ -6,8 +6,11 @@ using MiniBank.Core.Domains.Users.Services;
 using MiniBank.Data.Users;
 using MiniBank.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+
 namespace MiniBank.Web.Controllers.Users
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]/[action]", Name = "[controller]_[action]")]
     public class UserController

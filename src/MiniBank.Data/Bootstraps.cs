@@ -23,7 +23,7 @@ namespace MiniBank.Data
             services.AddScoped<IAccountRepository, AccountRepository>();
             services.AddScoped<ITransactionRepository, TransactionRepository>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddDbContext<MiniBankContext>(options => options.UseNpgsql(configuration["DbConnectionString"]));
+            services.AddDbContext<MiniBankContext>(options => options.UseNpgsql(configuration["DataBase:ConnectionString"]));
 
             return services;
         }

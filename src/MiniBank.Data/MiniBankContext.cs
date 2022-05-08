@@ -65,7 +65,7 @@ namespace MiniBank.Data
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
             var options = new DbContextOptionsBuilder()
-                .UseNpgsql(config["DbConnectionString"]).ReplaceService<IHistoryRepository, CamelCaseHistoryContext>()
+                .UseNpgsql(config["DataBase:ConnectionString"]).ReplaceService<IHistoryRepository, CamelCaseHistoryContext>()
                 .UseSnakeCaseNamingConvention().Options;
             return new MiniBankContext(options);
         }
