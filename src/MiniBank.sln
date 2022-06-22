@@ -20,8 +20,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{CFACC267
 		..\build\MiniBank.Dockerfile = ..\build\MiniBank.Dockerfile
 	EndProjectSection
 EndProject
-Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{8ECCA6C6-7C68-44E6-95A4-9CB539CC30C1}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,10 +42,6 @@ Global
 		{F733AEDD-3714-4C40-AC8C-0BC057DC8BE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F733AEDD-3714-4C40-AC8C-0BC057DC8BE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F733AEDD-3714-4C40-AC8C-0BC057DC8BE5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8ECCA6C6-7C68-44E6-95A4-9CB539CC30C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8ECCA6C6-7C68-44E6-95A4-9CB539CC30C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8ECCA6C6-7C68-44E6-95A4-9CB539CC30C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8ECCA6C6-7C68-44E6-95A4-9CB539CC30C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
